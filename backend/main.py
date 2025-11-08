@@ -48,10 +48,6 @@ def save_image_file(image_file: UploadFile, user_id: int) -> str:
         )
 
 def get_face_embedding(image_path: str) -> str:
-    """
-    Generates a face embedding from an image file.
-    This will now "lazy-load" the model on the first request.
-    """
     try:
         embedding_objs = DeepFace.represent(
             img_path=image_path,
@@ -68,10 +64,6 @@ def get_face_embedding(image_path: str) -> str:
         )
 
 def find_best_match(unknown_embedding_str: str, db: Session) -> User | None:
-    """
-    Compares a new embedding against all known users in the database.
-    Returns the matched User object or None.
-    """
     unknown_embedding = np.array(json.loads(unknown_embedding_str))
     
     all_users = db.query(User).filter(User.embedding != None).all()
