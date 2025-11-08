@@ -93,3 +93,50 @@ conda activate face-api-env
 
 # 3. Install all Python packages
 pip install "fastapi[all]" sqlalchemy deepface numpy matplotlib ipykernel
+```
+
+### 2.  Frontend Setup
+
+```bash
+# In a new terminal, navigate to the frontend folder
+cd your-project/frontend
+
+# 1. Install all Node.js packages
+npm install
+
+# 2. Install the expo-ngrok tool (required for tunneling)
+sudo npm install --global @expo/ngrok@^4.1.0
+```
+###Running the Project
+##This project requires three separate terminals to run simultaneously.
+
+###Terminal 1: Start the Backend (FastAPI)
+```bash
+cd your-project/backend
+conda activate face-api-env
+uvicorn main:app --reload --port 8001
+```
+Your backend is now running on http://localhost:8001.
+
+###Terminal 2: Start the Tunnel (ngrok)
+```bash
+
+# This command requires a one-time setup with your authtoken
+# (See ngrok.com for info)
+ngrok http 8001
+```
+ngrok will give you a public URL (e.g., https://your-random-id.ngrok-free.app). Copy this URL.
+
+
+###Terminal 3: Start the Frontend (Expo)
+```bash
+
+cd your-project/frontend
+
+# 1. Update the API address
+#    Open 'api.js' and paste your new ngrok URL into the 'API_URL' variable.
+
+# 2. Start the app using the --tunnel flag
+npx expo start --tunnel
+```
+A QR code will appear. Scan this with the Expo Go app on your phone.
