@@ -12,7 +12,6 @@ from deepface import DeepFace
 import database
 from database import User, get_db, create_db_and_tables
 
-# --- 1. App Setup & Constants ---
 app = FastAPI(title="Face Recognition API")
 app.add_middleware(
     CORSMiddleware,
@@ -22,7 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# This function will run on startup instead
 @app.on_event("startup")
 def on_startup():
     """Create database tables on startup."""
@@ -34,10 +32,8 @@ FACES_STORAGE_PATH = "user_faces"
 MODEL_NAME = "ArcFace"
 SIMILARITY_THRESHOLD = 0.68
 
-# --- 2. Helper Functions (No longer use pre-loaded model) ---
 
 def save_image_file(image_file: UploadFile, user_id: int) -> str:
-    # This function is unchanged
     try:
         user_folder = os.path.join(FACES_STORAGE_PATH, f"user_{user_id}")
         os.makedirs(user_folder, exist_ok=True)
@@ -57,7 +53,6 @@ def get_face_embedding(image_path: str) -> str:
     This will now "lazy-load" the model on the first request.
     """
     try:
-        # --- 3. REMOVED the 'model=preloaded_model' argument ---
         embedding_objs = DeepFace.represent(
             img_path=image_path,
             model_name=MODEL_NAME,
@@ -67,7 +62,6 @@ def get_face_embedding(image_path: str) -> str:
         return json.dumps(embedding)
         
     except Exception as e:
-        # We re-raise the exception with its original message
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Could not process face from image: {e}"
@@ -90,7 +84,6 @@ def find_best_match(unknown_embedding_str: str, db: Session) -> User | None:
     for user in all_users:
         known_embedding = np.array(json.loads(user.embedding))
         
-        # Calculate cosine distance
         distance = 1 - (np.dot(unknown_embedding, known_embedding) / 
                         (np.linalg.norm(unknown_embedding) * np.linalg.norm(unknown_embedding)))
         
@@ -103,7 +96,6 @@ def find_best_match(unknown_embedding_str: str, db: Session) -> User | None:
     else:
         return None
 
-# --- 4. API Endpoints (Unchanged, but now use the fixed helpers) ---
 
 @app.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(
@@ -112,7 +104,6 @@ async def register(
     image_file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    # This function was already correct
     existing_user = db.query(User).filter(User.email == email).first()
     if existing_user:
         raise HTTPException(
@@ -153,8 +144,6 @@ async def recognize(
         shutil.copyfileobj(image_file.file, output_file)
 
     try:
-        # 1. Get embedding for the new face
-        # --- 5. REMOVED the 'model=preloaded_model' argument ---
         embedding_objs = DeepFace.represent(
             img_path=temp_image_path,
             model_name=MODEL_NAME,
@@ -162,7 +151,6 @@ async def recognize(
         )
         unknown_embedding_str = json.dumps(embedding_objs[0]["embedding"])
 
-        # 2. Find the best match
         matched_user = find_best_match(unknown_embedding_str, db)
 
         if not matched_user:
