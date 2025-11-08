@@ -107,10 +107,10 @@ npm install
 # 2. Install the expo-ngrok tool (required for tunneling)
 sudo npm install --global @expo/ngrok@^4.1.0
 ```
-###Running the Project
+### Running the Project
 ##This project requires three separate terminals to run simultaneously.
 
-###Terminal 1: Start the Backend (FastAPI)
+### Terminal 1: Start the Backend (FastAPI)
 ```bash
 cd your-project/backend
 conda activate face-api-env
@@ -118,7 +118,7 @@ uvicorn main:app --reload --port 8001
 ```
 Your backend is now running on http://localhost:8001.
 
-###Terminal 2: Start the Tunnel (ngrok)
+### Terminal 2: Start the Tunnel (ngrok)
 ```bash
 
 # This command requires a one-time setup with your authtoken
@@ -128,7 +128,7 @@ ngrok http 8001
 ngrok will give you a public URL (e.g., https://your-random-id.ngrok-free.app). Copy this URL.
 
 
-###Terminal 3: Start the Frontend (Expo)
+### Terminal 3: Start the Frontend (Expo)
 ```bash
 
 cd your-project/frontend
